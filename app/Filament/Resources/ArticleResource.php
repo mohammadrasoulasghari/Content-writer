@@ -6,7 +6,9 @@ use App\Filament\Resources\ArticleResource\Pages;
 use App\Filament\Resources\ArticleResource\RelationManagers;
 use App\Models\Article;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -29,13 +31,17 @@ class ArticleResource extends Resource
         return $form
             ->schema([
                 TextInput::make('title')
-                    ->required(),
+                    ->required()
+                    ->columnSpan(2),
                 TextInput::make('keywords')
-                    ->required(),
+                    ->required()
+                    ->columnSpan(2),
                 Textarea::make('description')
-                    ->required(),
+                    ->required()
+                    ->columnSpan(2),
                 RichEditor::make('content')
                     ->required()
+                    ->columnSpan(2)
                     ->toolbarButtons([
                         'bold',
                         'italic',
@@ -44,7 +50,21 @@ class ArticleResource extends Resource
                         'numberedList',
                         'blockQuote',
                     ]),
-            ]);
+                Repeater::make('members')
+                    ->schema([
+                        TextInput::make('name')->required(),
+                        Select::make('role')
+                            ->options([
+                                'member' => 'Member',
+                                'administrator' => 'Administrator',
+                                'owner' => 'Owner',
+                            ])
+                            ->required(),
+                    ])
+                    ->columns(2)
+                    ->columnSpan(2)
+            ])
+            ->columns(2);
     }
 
     public static function table(Table $table): Table
