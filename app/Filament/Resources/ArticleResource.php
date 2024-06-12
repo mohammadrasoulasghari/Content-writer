@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -31,38 +32,25 @@ class ArticleResource extends Resource
         return $form
             ->schema([
                 TextInput::make('title')
-                    ->required()
-                    ->columnSpan(2),
-                TextInput::make('keywords')
+                    ->label("عنوان مقاله")
                     ->required()
                     ->columnSpan(2),
                 Textarea::make('description')
-                    ->required()
+                    ->label("توضیحات ")
                     ->columnSpan(2),
-                RichEditor::make('content')
+                TagsInput::make('keywords')
                     ->required()
                     ->columnSpan(2)
-                    ->toolbarButtons([
-                        'bold',
-                        'italic',
-                        'link',
-                        'bulletList',
-                        'numberedList',
-                        'blockQuote',
-                    ]),
-                Repeater::make('members')
-                    ->schema([
-                        TextInput::make('name')->required(),
-                        Select::make('role')
-                            ->options([
-                                'member' => 'Member',
-                                'administrator' => 'Administrator',
-                                'owner' => 'Owner',
-                            ])
-                            ->required(),
-                    ])
-                    ->columns(2)
-                    ->columnSpan(2)
+                    ->label('کلید واژه های  مقاله')
+                    ->placeholder('بعد از وارد کردن هر کلید واژه یه enter بزنید'),
+//                Repeater::make('members')
+//                    ->maxItems(3)
+//                    ->label("متون انگلیسی")
+//                    ->schema([
+//                        TextInput::make('متن')
+//                            ->columns(2),
+//                    ])
+//                    ->columnSpan(2)
             ])
             ->columns(2);
     }

@@ -18,7 +18,23 @@ class EditArticle extends EditRecord
             ->schema([
                 RichEditor::make('content')
                     ->required()
-                    ->columnSpan('full'),
+                    ->columnSpan('full')
+                    ->toolbarButtons([
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        'bulletList',
+                        'codeBlock',
+                        'h2',
+                        'h3',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'underline',
+                        'undo',
+                    ]),
             ]);
     }
 
