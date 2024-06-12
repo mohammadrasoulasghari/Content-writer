@@ -9,6 +9,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -34,6 +35,10 @@ class AdminPanelProvider extends PanelProvider
             ->font('Vazirmatn', provider: GoogleFontProvider::class)
             ->colors([
                 'primary' => Color::Blue,
+                'slate' => Color::Blue,
+            ])
+            ->assets([
+                Css::make('custom-stylesheet', asset('css/custom.css')),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
