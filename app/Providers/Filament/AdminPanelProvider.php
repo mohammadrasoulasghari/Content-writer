@@ -28,6 +28,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName("7Learn")
+            ->brandLogo(asset("7learn-logo.svg"))
+            ->favicon(asset("7learn-logo.svg"))
             ->login()
             ->font('Vazirmatn', provider: GoogleFontProvider::class)
             ->colors([
