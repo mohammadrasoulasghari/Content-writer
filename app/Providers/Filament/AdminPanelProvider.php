@@ -29,13 +29,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName("7Learn")
-            ->brandLogo(asset("7learn-logo.svg"))
+            ->brandLogo(asset("logo-white.svg"))
             ->favicon(asset("7learn-logo.svg"))
             ->login()
             ->font('Vazirmatn', provider: GoogleFontProvider::class)
             ->colors([
                 'primary' => Color::Blue,
-                'slate' => Color::Blue,
             ])
             ->assets([
                 Css::make('custom-stylesheet', asset('css/custom.css')),
