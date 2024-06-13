@@ -37,7 +37,6 @@ class UserResource extends Resource
                     TextInput::make('password')
                         ->label('رمز عبور')
                         ->password()
-                        ->required()
                         ->dehydrateStateUsing(fn ($state) => !empty($state) ? bcrypt($state) : null),
                     DatePicker::make('email_verified_at')
                         ->label('تاریخ تایید ایمیل')
