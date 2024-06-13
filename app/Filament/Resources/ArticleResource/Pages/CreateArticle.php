@@ -3,52 +3,69 @@
 namespace App\Filament\Resources\ArticleResource\Pages;
 
 use App\Filament\Resources\ArticleResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\NoReturn;
 use OpenAI\Laravel\Facades\OpenAI;
+use App\Models\Prompt;
 
 class CreateArticle extends CreateRecord
 {
     protected static string $resource = ArticleResource::class;
 
-    #[NoReturn] protected function mutateFormDataBeforeCreate(array $data): array
+    #[NoReturn]
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $keyWords = implode(',', $data['keywords']);
+        $keyWords = $this->formatKeywords($data['keywords'] ?? []);
+        $englishSentences = $this->formatEnglishSentences($data['english_sentences'] ?? []);
 
-        if (!empty($keyWords)) {
-            $keyWordPrompt = "
-            بیا از این کلمات کلیدی حتما توی مقاله استفاده کن  $keyWords
-            ";
-        }
-        $prompt = "
-        می خوام یه مقاله عالی و با جزئیات کامل و مفید برای خواننده برای من بنویسی.
-        موضوع مقاله: {$data['title']}
-        نوع مقاله: معرفی زبان یا تکنولوژی یا ابزار
-        لحن مقاله: صمیمی و خطاب به دوم شخص مفرد و با مثال های با مزه و جذاب برای نسل z (رعایت این لحن در تمام مقاله بسیار ضروری است)
-        اندازه مقاله: 2000 کلمه (لطفا با جزئیات و توضیحات کامل بنویس که اندازه مقاله حتما بالاتر از این تعداد کلمات باشد)
-        ";
+        $promptTemplate = Prompt::where('title', 'main')->first()->prompt;
+        $prompt = $this->generatePrompt($promptTemplate, $data['title'], $data['description'] ?? '', $keyWords, $englishSentences);
+//        $response = $this->getOpenAIResponse($prompt);
 
-        if ($keyWordPrompt) {
-            $prompt .= $keyWordPrompt;
-        }
+        $data['content'] = "Ssfsdfsdf";
+        $data['chat_id'] = "sdfsdffs";
 
-        if (!empty($data['description'])) {
-            $prompt .= $data['description'];
-        }
-
-
-//        $response = OpenAI::chat()->create([
-//            'model' => 'gpt-3.5-turbo',
-//            'messages' => [
-//                ['role' => 'user', 'content' => $prompt],
-//                ['role' => 'system', 'content' => "تو باید توی کل محتوایی که مینویسی همیشه لحن ات صمیمی باشه و هیچ جا رسمی نگو و حتما خروجی ات رو با تگ های html بده و heading رو توی مقاله ات رعایت کن"],
-//            ],
-//        ]);
-        $data['content'] = "->message->content";
-        $data['chat_id'] = "sdfsdfsdfs";
         return $data;
+    }
+
+    private function formatKeywords(array $keywords): string
+    {
+        return implode(',', $keywords);
+    }
+
+    private function formatEnglishSentences(array $sentences): string
+    {
+        return implode('. ', $sentences);
+    }
+
+    private function generatePrompt(string $template, string $title, string $description, string $keywords, string $englishSentences): string
+    {
+        $prompt = str_replace('{title}', $title, $template);
+
+        if (!empty($keywords)) {
+            $prompt .= "\nبیا از این کلمات کلیدی حتما توی مقاله استفاده کن: $keywords";
+        }
+
+        if (!empty($description)) {
+            $prompt .= "\n$description";
+        }
+
+        if (!empty($englishSentences)) {
+            $prompt .= "\nلطفاً این جملات انگلیسی را نیز در مقاله بگنجان: $englishSentences";
+        }
+
+        return $prompt;
+    }
+
+    private function getOpenAIResponse(string $prompt): array
+    {
+        return OpenAI::chat()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
+                ['role' => 'user', 'content' => $prompt],
+                ['role' => 'system', 'content' => "تو باید توی کل محتوایی که مینویسی همیشه لحن ات صمیمی باشه و هیچ جا رسمی نگو و حتما خروجی ات رو با تگ های html بده و heading رو توی مقاله ات رعایت کن"],
+            ],
+        ]);
     }
 
     protected function afterCreate(): void

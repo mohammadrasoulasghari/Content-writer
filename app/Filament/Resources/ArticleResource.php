@@ -57,9 +57,9 @@ class ArticleResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title'),
-                Tables\Columns\TextColumn::make('keywords'),
-                Tables\Columns\TextColumn::make('description'),
+                Tables\Columns\TextColumn::make('title')->label('عنوان مقاله'),
+                Tables\Columns\TextColumn::make('keywords')->label('کلمات کلیدی'),
+                Tables\Columns\TextColumn::make('description')->label('توضیحات'),
             ])
             ->filters([
                 //
