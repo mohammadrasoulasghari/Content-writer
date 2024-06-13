@@ -15,7 +15,7 @@ class CreateArticle extends CreateRecord
 
     #[NoReturn] protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $keyWords = implode(',',$data['keywords']);
+        $keyWords = implode(',', $data['keywords']);
 
         if (!empty($keyWords)) {
             $keyWordPrompt = "
@@ -34,23 +34,20 @@ class CreateArticle extends CreateRecord
             $prompt .= $keyWordPrompt;
         }
 
-        if (!empty($data['description'])){
-            $prompt.= $data['description'];
+        if (!empty($data['description'])) {
+            $prompt .= $data['description'];
         }
 
 
-        $response = OpenAI::chat()->create([
-            'model' => 'gpt-3.5-turbo',
-            'messages' => [
-                ['role' => 'user', 'content' => $prompt],
-                ['role' => 'system', 'content' => "تو باید توی کل محتوایی که مینویسی همیشه لحن ات صمیمی باشه و هیچ جا رسمی نگو و حتما خروجی ات رو با تگ های html بده و heading رو توی مقاله ات رعایت کن"],
-            ],
-        ]);
-        $data['content'] = $response->choices[0]->message->content;
-        $data['chat_id'] = $response->id;
-        $data['keywords'] = $response->id;
-        $data['description'] = $response->id;
-        Log::info($response->choices[0]->message->content);
+//        $response = OpenAI::chat()->create([
+//            'model' => 'gpt-3.5-turbo',
+//            'messages' => [
+//                ['role' => 'user', 'content' => $prompt],
+//                ['role' => 'system', 'content' => "تو باید توی کل محتوایی که مینویسی همیشه لحن ات صمیمی باشه و هیچ جا رسمی نگو و حتما خروجی ات رو با تگ های html بده و heading رو توی مقاله ات رعایت کن"],
+//            ],
+//        ]);
+        $data['content'] = "->message->content";
+        $data['chat_id'] = "sdfsdfsdfs";
         return $data;
     }
 
