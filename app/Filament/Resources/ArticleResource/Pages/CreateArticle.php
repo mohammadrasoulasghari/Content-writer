@@ -20,11 +20,10 @@ class CreateArticle extends CreateRecord
 
         $promptTemplate = Prompt::where('title', 'main')->first()->prompt;
         $prompt = $this->generatePrompt($promptTemplate, $data['title'], $data['description'] ?? '', $keyWords, $englishSentences);
-//        $response = $this->getOpenAIResponse($prompt);
+        $response = $this->getOpenAIResponse($prompt);
 
-        $data['content'] = "Ssfsdfsdf";
-        $data['chat_id'] = "sdfsdffs";
-
+        $data['content'] = $response['choices'][0]['message']['content'] ?? '';
+        $data['chat_id'] = $response['id'] ?? '';
         return $data;
     }
 
@@ -57,7 +56,7 @@ class CreateArticle extends CreateRecord
         return $prompt;
     }
 
-    private function getOpenAIResponse(string $prompt): array
+    private function getOpenAIResponse(string $prompt)
     {
         return OpenAI::chat()->create([
             'model' => 'gpt-3.5-turbo',
