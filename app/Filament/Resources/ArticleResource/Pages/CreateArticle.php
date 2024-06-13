@@ -59,10 +59,14 @@ class CreateArticle extends CreateRecord
     private function getOpenAIResponse(string $prompt)
     {
         return OpenAI::chat()->create([
-            'model' => 'gpt-3.5-turbo',
+            'model' => 'gpt-4o',
             'messages' => [
                 ['role' => 'user', 'content' => $prompt],
                 ['role' => 'system', 'content' => "تو باید توی کل محتوایی که مینویسی همیشه لحن ات صمیمی باشه و هیچ جا رسمی نگو و حتما خروجی ات رو با تگ های html بده و heading رو توی مقاله ات رعایت کن"],
+                [
+                    'role' => 'assistant',
+                    'content' => "لطفاً اطلاعات بیشتری در مورد موضوع مقاله و جزئیات مورد نیاز فراهم کنید تا بتوانم دقیق‌تر پاسخ بدهم."
+                ]
             ],
         ]);
     }
