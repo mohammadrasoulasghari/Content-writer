@@ -92,8 +92,6 @@ class TopicResource extends Resource
                 TextColumn::make('english_name')->label('نام به انگلیسی'),
                 TextColumn::make('slug')->label('Slug'),
                 TextColumn::make('description')->label('توضیحات'),
-                BooleanColumn::make('is_approved')->label('تایید شده'),
-                DateColumn::make('approved_at')->label('تاریخ تایید'),
                 TextColumn::make('priority')->label('اولویت'),
                 TextColumn::make('tags')->label('برچسب‌ها'),
                 TextColumn::make('author.name')->label('نویسنده'),
