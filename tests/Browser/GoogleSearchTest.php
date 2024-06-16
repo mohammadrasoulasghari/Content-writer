@@ -16,7 +16,7 @@ class GoogleSearchTest extends DuskTestCase
     public function testGoogleSearch()
     {
         $searchQuery = getenv('SEARCH_QUERY');
-        $resultCount = getenv('RESULT_COUNT') ?: 3; // گرفتن آرگومان تعداد نتایج یا مقدار پیش‌فرض
+        $resultCount = getenv('RESULT_COUNT') ?: 3;
 
         if (empty($searchQuery)) {
             $this->fail('The search query parameter is required.');
