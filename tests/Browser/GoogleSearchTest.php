@@ -7,6 +7,7 @@ use Tests\DuskTestCase;
 
 class GoogleSearchTest extends DuskTestCase
 {
+
     /**
      * A basic browser test example.
      *
@@ -14,19 +15,24 @@ class GoogleSearchTest extends DuskTestCase
      */
     public function testGoogleSearch()
     {
-        $this->browse(function (Browser $browser) {
-            $browser->visit('https://www.google.com/search?q=site:7learn.com+pwa')
-                ->pause(3000); // برای اطمینان از بارگذاری کامل صفحه
+        $searchQuery = getenv('SEARCH_QUERY');
+        $resultCount = getenv('RESULT_COUNT') ?: 3; // گرفتن آرگومان تعداد نتایج یا مقدار پیش‌فرض
+
+        if (empty($searchQuery)) {
+            $this->fail('The search query parameter is required.');
+        }
+
+        $this->browse(function (Browser $browser) use ($searchQuery, $resultCount) {
+            $browser->visit('https://www.google.com/search?q=' . urlencode($searchQuery))
+                ->pause(3000);
 
             $results = $browser->elements('.g');
             $output = [];
 
-            // نمایش سه نتیجه اول
-            foreach (array_slice($results, 0, 3) as $result) {
+            foreach (array_slice($results, 0, $resultCount) as $result) {
                 $output[] = $result->getText();
             }
 
-            // چاپ نتایج به صورت JSON
             echo json_encode($output);
         });
     }

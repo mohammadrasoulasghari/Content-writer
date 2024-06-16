@@ -1,10 +1,7 @@
 <?php
 
-use App\Http\Controllers\TopicImportController;
-use App\Services\GoogleSearchService;
-use Illuminate\Support\Facades\Artisan;
+use App\Services\Scraping\GoogleChrome\GoogleChromeScrapingService;
 use Illuminate\Support\Facades\Route;
-use Tests\Browser\GoogleSearchTest;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,14 +15,7 @@ use Tests\Browser\GoogleSearchTest;
 */
 
 Route::get('/', function () {
-    $basePath = base_path();
+    $result = GoogleChromeScrapingService::scrape("site:7learn.com powerbi",5);
 
-    // تغییر مسیر به دایرکتوری پروژه و اجرای دستور تست Dusk
-    $output = shell_exec("cd $basePath && php artisan dusk --filter=GoogleSearchTest");
-
-    // استخراج خروجی JSON از خروجی کامل دستور
-    preg_match('/\[(.*?)\]/s', $output, $matches);
-    $results = isset($matches[0]) ? json_decode($matches[0], true) : [];
-
-    dd($results);
+    dd($result);
 });
