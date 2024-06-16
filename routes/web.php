@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\Scraping\GoogleChrome\GoogleChromeScrapingService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +15,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+<<<<<<< HEAD
    return redirect("/admin");
+=======
+    $result = GoogleChromeScrapingService::scrape("site:7learn.com powerbi",5);
+
+    dd($result);
+>>>>>>> Dusk
 });

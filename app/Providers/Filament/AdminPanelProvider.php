@@ -29,13 +29,20 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName("7Learn")
+<<<<<<< HEAD
             ->brandLogo(asset("7learn-logo.svg"))
+=======
+            ->brandLogo(asset("logo-white.svg"))
+>>>>>>> Dusk
             ->favicon(asset("7learn-logo.svg"))
             ->login()
             ->font('Vazirmatn', provider: GoogleFontProvider::class)
             ->colors([
                 'primary' => Color::Blue,
+<<<<<<< HEAD
                 'slate' => Color::Blue,
+=======
+>>>>>>> Dusk
             ])
             ->assets([
                 Css::make('custom-stylesheet', asset('css/custom.css')),
@@ -48,7 +55,11 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
+<<<<<<< HEAD
                 Widgets\FilamentInfoWidget::class,
+=======
+//                Widgets\FilamentInfoWidget::class,
+>>>>>>> Dusk
             ])
             ->middleware([
                 EncryptCookies::class,

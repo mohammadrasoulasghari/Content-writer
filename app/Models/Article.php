@@ -8,5 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Article extends Model
 {
     protected $guarded = [];
+<<<<<<< HEAD
     use HasFactory;
+=======
+
+    protected $casts = [
+        'keywords' => 'array',
+        'english_texts' => 'array',
+    ];
+>>>>>>> Dusk
 }

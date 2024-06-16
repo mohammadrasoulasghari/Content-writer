@@ -6,6 +6,12 @@ use App\Filament\Resources\PromptResource\Pages;
 use App\Filament\Resources\PromptResource\RelationManagers;
 use App\Models\Prompt;
 use Filament\Forms;
+<<<<<<< HEAD
+=======
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+>>>>>>> Dusk
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -16,14 +22,40 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class PromptResource extends Resource
 {
     protected static ?string $model = Prompt::class;
+<<<<<<< HEAD
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+=======
+    protected static ?string $label = 'پرامپت';
+    protected static ?string $pluralLabel = 'پرامپت ها';
+    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
+>>>>>>> Dusk
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+<<<<<<< HEAD
                 //
+=======
+                Card::make()
+                    ->schema([
+                        TextInput::make('title')
+                            ->label('عنوان')
+                            ->placeholder('عنوان پرامپت را وارد کنید')
+                            ->helperText('این عنوان برای شناسایی پرامپت استفاده می‌شود.')
+                            ->required()
+                            ->columnSpan(2),
+                        Forms\Components\RichEditor::make('prompt')
+                            ->label('پرامپت')
+                            ->placeholder('پرامپت را وارد کنید')
+                            ->helperText('پرامپت خود را در اینجا وارد کنید.')
+                            ->required()
+                            ->columnSpan(2),
+                    ])
+                    ->columns(2) // تعداد ستون‌های داخل کارت
+                    ->columnSpan('full'), // کارت در تمام عرض صفحه قرار بگیرد
+>>>>>>> Dusk
             ]);
     }
 
@@ -31,7 +63,12 @@ class PromptResource extends Resource
     {
         return $table
             ->columns([
+<<<<<<< HEAD
                 //
+=======
+                Tables\Columns\TextColumn::make('title'),
+
+>>>>>>> Dusk
             ])
             ->filters([
                 //
