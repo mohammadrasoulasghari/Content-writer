@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TopicResource\Pages;
 use App\Models\Topic;
 use App\Models\User;
+use App\Services\Scraping\GoogleChrome\GoogleChromeScrapingService;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -102,6 +103,15 @@ class TopicResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('viewResults')
+                    ->label('مشاهده نتایج')
+                    ->modalHeading('نتایج جستجو')
+                    ->modalContent(fn (Topic $topic) => view(
+                        "livewire.search-result",
+                        ["topic" => $topic]
+                    ))
+                    ->modalButton('بستن')
+
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $result = GoogleChromeScrapingService::scrape("site:7learn.com powerbi",5);
-
-    dd($result);
+    return redirect('/admin');
+});
+Route::get('/s', function () {
+    $r = GoogleChromeScrapingService::scrape('site:7learn.com pwa');
+    dd($r);
 });
