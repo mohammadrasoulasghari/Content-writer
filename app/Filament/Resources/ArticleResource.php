@@ -33,7 +33,7 @@ class ArticleResource extends Resource
                         ->required()
                         ->columnSpan(2),
                     Textarea::make('description')
-                        ->label("توضیحات ")
+                        ->label("سناریو ")
                         ->columnSpan(2),
                     TagsInput::make('keywords')
                         ->required()

@@ -18,6 +18,6 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 Route::get('/s', function () {
-    $r = GoogleChromeScrapingService::scrape('site:7learn.com pwa');
+    $r = GoogleChromeScrapingService::scrape('داکر چیست؟');
     dd($r);
 });
