@@ -4,9 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ArticleResource\Pages;
 use App\Filament\Resources\ArticleResource\RelationManagers;
+use App\Models\AiModel;
 use App\Models\Article;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -40,6 +42,10 @@ class ArticleResource extends Resource
                         ->columnSpan(2)
                         ->label('کلید واژه های  مقاله')
                         ->placeholder('بعد از وارد کردن هر کلید واژه یه enter بزنید'),
+                    Select::make('ai_model_id')
+                        ->label('مدل هوش مصنوعی مدنظر')
+                        ->relationship('aiModel', 'name')
+                        ->required(),
                     Repeater::make('english_texts')
                         ->maxItems(3)
                         ->label("متون انگلیسی")
@@ -47,7 +53,7 @@ class ArticleResource extends Resource
                             Textarea::make('متن')
                                 ->columns(2),
                         ])
-                        ->columnSpan(2)
+                        ->columnSpan(2),
                 ])
             ])
             ->columns(2);
