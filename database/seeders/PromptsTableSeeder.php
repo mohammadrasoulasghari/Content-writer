@@ -15,10 +15,39 @@ class PromptsTableSeeder extends Seeder
     {
         $json = file_get_contents(database_path('prompt_data.json'));
         $data = json_decode($json, true);
+        $prompts = [
+            [
+                "title" => "main",
+                "prompt" => $data['main'],
+            ],
+            [
+                "title" => "system",
+                "prompt" => $data['system']
+            ],
+            [
+                "title" => "assistant",
+                "prompt" => $data['assistant']
+            ],
+            [
+                "title" => "keywords",
+                "prompt" => $data['keywords']
+            ],
+            [
+                "title" => "description",
+                "prompt" => $data['description']
+            ],
+            [
+                "title" => "english_sentences",
+                "prompt" => $data['english_sentences']
+            ],
+        ];
 
-        Prompt::create([
-            "title" => "main",
-            "prompt" => $data['prompt']
-        ]);
+        foreach ($prompts as $prompt){
+            Prompt::updateOrCreate([
+                "title" => $prompt['title'],
+                "prompt" => $prompt['prompt']
+            ]);
+        }
+
     }
 }
