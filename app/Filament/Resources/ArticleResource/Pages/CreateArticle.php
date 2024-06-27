@@ -30,16 +30,15 @@ class CreateArticle extends CreateRecord
             $assistantPrompt = $prompts['assistant'];
             $aiModelId = $data['ai_model_id'];
             $openAIService = new OpenAIService($aiModelId, $systemPrompt, $assistantPrompt);
-
             $mainPrompt = $this->generatePrompt($prompts['main'], $data['title'], $description, $keyWords, $englishSentences);
             $response = $openAIService->createChat($mainPrompt);
 
             if (!isset($response['choices'][0]['message']['content'])) {
                 throw new \Exception('Main prompt response not received.');
             }
-
             $data['content'] = $response['choices'][0]['message']['content'];
             $data['chat_id'] = $response['id'];
+            $data['prompts'] = $mainPrompt;
         } catch (\Exception $e) {
             Notification::make()
                 ->title('Error')
@@ -47,7 +46,6 @@ class CreateArticle extends CreateRecord
                 ->danger()
                 ->send();
 
-            // Add this to return the original data if there's an exception
             return $data;
         }
 
