@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class WritingStep extends Model
 {
     protected $guarded = [];
+    protected $casts = [
+        'placeholders' => 'array',
+    ];
 }

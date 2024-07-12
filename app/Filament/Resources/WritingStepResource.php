@@ -6,6 +6,7 @@ use App\Filament\Resources\WritingStepResource\Pages;
 use App\Models\WritingStep;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -53,6 +54,22 @@ class WritingStepResource extends Resource
                             ->label('پرامپت')
                             ->required()
                             ->columnSpanFull(),
+                        Repeater::make('placeholders')
+                            ->label('متغیرهای جایگزینی')
+                            ->helperText('مثال: {subject} که به موضوع مقاله جایگزین می‌شود. متغیر پیش‌فرض: {title}')
+                            ->schema([
+                                Grid::make(2)
+                                    ->schema([
+                                        TextInput::make('key')
+                                            ->label('کلید')
+                                            ->required()
+                                            ->default('title')
+                                            ->hint('کلید جایگزینی باید منحصربه‌فرد باشد و نباید تکراری باشد.')
+                                            ->columnSpan(1),
+                                    ]),
+                            ])
+                            ->columnSpanFull()
+                            ->minItems(2),
                     ])
                     ->columns(1),
             ]);
