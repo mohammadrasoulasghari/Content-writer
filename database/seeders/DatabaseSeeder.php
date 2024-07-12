@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     {
          $this->call([
              PromptsTableSeeder::class,
-//             UserTableSeeder::class
+             UserTableSeeder::class
          ]);
     }
 }
