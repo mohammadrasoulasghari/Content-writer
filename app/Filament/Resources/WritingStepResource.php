@@ -7,6 +7,7 @@ use App\Models\WritingStep;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -16,6 +17,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -38,12 +40,17 @@ class WritingStepResource extends Resource
                                 TextInput::make('name')
                                     ->label('نام مرحله')
                                     ->required()
-                                    ->columnSpan(1),
+                                    ->columnSpan(2),
                                 TextInput::make('order')
                                     ->label('ترتیب')
                                     ->numeric()
                                     ->default(0)
                                     ->columnSpan(1),
+                                Select::make('content_type_id')
+                                    ->label('نوع محتوا')
+                                    ->relationship('contentType', 'name')
+                                    ->required()
+                                    ->columnSpan(2),
                                 Toggle::make('status')
                                     ->label('وضعیت')
                                     ->inline(false)
@@ -55,10 +62,10 @@ class WritingStepResource extends Resource
                             ->required()
                             ->columnSpanFull(),
                         Repeater::make('placeholders')
-                            ->label('متغیرهای جایگزینی')
+                            ->label('متغیر جایگزینی')
                             ->helperText('مثال: {subject} که به موضوع مقاله جایگزین می‌شود. متغیر پیش‌فرض: {title}')
                             ->schema([
-                                Grid::make(2)
+                                Grid::make(1)
                                     ->schema([
                                         TextInput::make('key')
                                             ->label('کلید')
@@ -69,7 +76,7 @@ class WritingStepResource extends Resource
                                     ]),
                             ])
                             ->columnSpanFull()
-                            ->minItems(2),
+                            ->minItems(1),
                     ])
                     ->columns(1),
             ]);
@@ -95,8 +102,17 @@ class WritingStepResource extends Resource
                 BooleanColumn::make('status')
                     ->label('وضعیت')
                     ->sortable(),
+                TextColumn::make('contentType.name')
+                    ->label('نوع محتوا')
+                    ->sortable()
+                    ->searchable(),
+
             ])
             ->filters([
+                SelectFilter::make('content_type_id')
+                    ->label('نوع محتوا')
+                    ->relationship('contentType', 'name')
+                    ->placeholder('همه انواع محتوا'),
                 Filter::make('status')
                     ->label('فعال/غیرفعال')
                     ->query(fn (Builder $query): Builder => $query->where('status', true)),

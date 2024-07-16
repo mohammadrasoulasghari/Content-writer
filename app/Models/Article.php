@@ -25,4 +25,8 @@ class Article extends Model
     {
         return $this->morphMany(RequestLog::class, 'loggable');
     }
+    public function contentType(): BelongsTo
+    {
+        return $this->belongsTo(ContentType::class);
+    }
 }

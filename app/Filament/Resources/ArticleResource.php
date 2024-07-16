@@ -34,6 +34,10 @@ class ArticleResource extends Resource
                         ->label("عنوان مقاله")
                         ->required()
                         ->columnSpan(2),
+                    Select::make('content_type_id')
+                        ->label('نوع محتوا')
+                        ->relationship('contentType', 'name')
+                        ->required(),
                     Textarea::make('description')
                         ->label("سناریو ")
                         ->columnSpan(2),

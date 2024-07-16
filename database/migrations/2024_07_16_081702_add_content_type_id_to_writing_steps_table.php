@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('writing_steps', function (Blueprint $table) {
-            $table->json('placeholders')->after('prompt');
+            $table->foreignId('content_type_id')->nullable()->constrained('content_types');
         });
     }
 
@@ -22,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('writing_steps', function (Blueprint $table) {
-            $table->dropColumn('placeholder');
+            $table->dropForeign(['content_type_id']);
+            $table->dropColumn('content_type_id');
         });
     }
 };

@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('writing_steps', function (Blueprint $table) {
-            $table->json('placeholders')->after('prompt');
+        Schema::create('content_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('writing_steps', function (Blueprint $table) {
-            $table->dropColumn('placeholder');
-        });
+        Schema::dropIfExists('content_types');
     }
 };
