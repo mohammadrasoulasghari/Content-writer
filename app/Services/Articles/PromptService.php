@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services\Articles;
 
 use App\Models\Prompt;

@@ -2,12 +2,15 @@
 namespace App\Filament\Resources\ArticleResource\Pages;
 
 use App\Filament\Resources\ArticleResource;
-use App\Models\Prompt;
-use App\Services\Articles\PromptService;
+use App\Models\Article;
+use App\Models\WritingStep;
+use App\Models\RequestLog;
 use App\Services\OpenAi\OpenAIService;
 use Filament\Resources\Pages\CreateRecord;
-use JetBrains\PhpStorm\NoReturn;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
+use JetBrains\PhpStorm\NoReturn;
+use App\Jobs\ProcessOpenAIRequest;
 
 class CreateArticle extends CreateRecord
 {
@@ -17,58 +20,73 @@ class CreateArticle extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         try {
-            $titles = ['main', 'system', 'assistant', 'keywords', 'description', 'english_sentences'];
-            $promptService = new PromptService($titles);
+            unset($data['english_texts']);//موقت فعلا
+            $writingSteps = WritingStep::where('content_type_id', $data['content_type_id'])
+                ->orderBy('order')
+                ->get();
 
-            $prompts = $promptService->getPrompts();
+            $content = '';
+            $chatId = null;
 
-            $keyWords = $this->generatePrompt($prompts['keywords'], '', '', implode(',', $data['keywords'] ?? []), '');
-            $description = $this->generatePrompt($prompts['description'], '', $data['description'] ?? '', '', '');
-            $englishSentences = $this->generatePrompt($prompts['english_sentences'], '', '', '', implode('. ', $data['english_sentences'] ?? []));
+            DB::transaction(function () use ($writingSteps, $data, &$content, &$chatId) {
+                foreach ($writingSteps as $step) {
+                    $prompt = $this->generatePrompt($step->prompt, $data['title']);
+                    ProcessOpenAIRequest::dispatch($data['ai_model_id'], $prompt, $chatId)
+                        ->onQueue('openai');
 
-            $systemPrompt = $prompts['system'];
-            $assistantPrompt = $prompts['assistant'];
-            $aiModelId = $data['ai_model_id'];
-            $openAIService = new OpenAIService($aiModelId, $systemPrompt, $assistantPrompt);
-            $mainPrompt = $this->generatePrompt($prompts['main'], $data['title'], $description, $keyWords, $englishSentences);
-            $response = $openAIService->createChat($mainPrompt);
+                    $response = $this->sendToOpenAI($data['ai_model_id'], $prompt, $chatId);
 
-            if (!isset($response['choices'][0]['message']['content'])) {
-                throw new \Exception('Main prompt response not received.');
-            }
-            $data['content'] = $response['choices'][0]['message']['content'];
-            $data['chat_id'] = $response['id'];
-            $data['prompts'] = $mainPrompt;
+                    RequestLog::create([
+                        'loggable_type' => Article::class,
+                        'loggable_id' => 0,
+                        'writing_step_id' => $step->id,
+                        'request' => $prompt,
+                        'response' => $response['choices'][0]['message']['content'] ?? null,
+                        'sequence' => $step->order,
+                        'chat_id' => $response['id'] ?? null,
+                    ]);
+
+                    $content .= ($response['choices'][0]['message']['content'] ?? '') . "\n";
+                    $chatId = $response['id'] ?? $chatId;
+                }
+            });
+            $data['content'] = $content;
         } catch (\Exception $e) {
-            Notification::make()
-                ->title('Error')
-                ->body('خطا در حین ایجاد مقاله => ' . $e->getMessage())
-                ->danger()
-                ->send();
-
+            $this->handleException($e);
             return $data;
         }
 
         return $data;
     }
 
-    private function generatePrompt(string $template, string $title, string $description, string $keywords, string $englishSentences): string
+    private function generatePrompt(string $template, string $title): string
     {
-        $prompt = str_replace('{title}', $title, $template);
-        $prompt = str_replace('{keywords}', $keywords, $prompt);
-        $prompt = str_replace('{description}', $description, $prompt);
-        $prompt = str_replace('{english_sentences}', $englishSentences, $prompt);
+        return str_replace('{title}', $title, $template);
+    }
 
-        // Add specific instructions to ensure detailed and comprehensive content
-        $prompt .= "\nلطفا مقاله ای جامع و کامل با حداقل 5000 کلمه بنویسید که شامل توضیحات دقیق و مثال های کاربردی باشد.";
-        $prompt .= "\nلطفاً از لحن صمیمی و دوستانه استفاده کنید و سعی کنید مقاله را جذاب و گیرا نگه دارید.";
-        $prompt .= "\nدر طول مقاله به نقل قول ها و منابع معتبر اشاره کنید و برای هر بخش از تگ های HTML مناسب استفاده کنید.";
+    private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId)
+    {
+        $openAIService = new OpenAIService($aiModelId, 'سیستم', 'دستیار');
+        return $openAIService->createChat($prompt, $chatId);
+    }
 
-        return $prompt;
+    private function handleException(\Exception $e): void
+    {
+        \Log::error('Error while creating article: ' . $e->getMessage(), [
+            'exception' => $e,
+        ]);
+
+        Notification::make()
+            ->title('خطا')
+            ->body('خطا در حین ایجاد مقاله: ' . $e->getMessage())
+            ->danger()
+            ->send();
     }
 
     protected function afterCreate(): void
     {
+        RequestLog::where('loggable_id', 0)
+            ->update(['loggable_id' => $this->record->getKey()]);
         $this->redirect(ArticleResource::getUrl('edit', ['record' => $this->record->getKey()]));
     }
 }

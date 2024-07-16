@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Services\OpenAi;
 
 use App\Models\AiModel;
 use OpenAI\Laravel\Facades\OpenAI;
+use Illuminate\Support\Facades\Cache;
 
 class OpenAIService
 {
@@ -18,19 +18,36 @@ class OpenAIService
         $this->assistantPrompt = $assistantPrompt;
     }
 
-    public function createChat(string $prompt)
+    public function createChat(string $prompt, ?string $chatId = null)
     {
-        $model = AIModel::find($this->aiModelId);
-        if (!$model) {
-            throw new \Exception('AI model not found');
+        $cacheKey = md5($prompt . ($chatId ?? ''));
+
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
         }
-        return OpenAI::chat()->create([
+
+        $model = AiModel::find($this->aiModelId);
+        if (!$model) {
+            throw new \Exception('مدل هوش مصنوعی پیدا نشد.');
+        }
+
+        $messages = [
+            ['role' => 'user', 'content' => $prompt],
+            ['role' => 'system', 'content' => $this->systemPrompt],
+            ['role' => 'assistant', 'content' => $this->assistantPrompt],
+        ];
+
+        if ($chatId) {
+            $messages[] = ['role' => 'system', 'content' => 'Continue chat: ' . $chatId];
+        }
+
+        $response = OpenAI::chat()->create([
             'model' => $model->identifier,
-            'messages' => [
-                ['role' => 'user', 'content' => $prompt],
-                ['role' => 'system', 'content' => $this->systemPrompt],
-                ['role' => 'assistant', 'content' => $this->assistantPrompt],
-            ],
+            'messages' => $messages,
         ]);
+
+        Cache::put($cacheKey, $response, now()->addMinutes(10));
+
+        return $response;
     }
 }
