@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RequestLog extends Model
 {
@@ -15,8 +16,8 @@ class RequestLog extends Model
         return $this->morphTo();
     }
 
-    public function prompt(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function writingStep(): BelongsTo
     {
-        return $this->belongsTo(Prompt::class);
+        return $this->belongsTo(WritingStep::class);
     }
 }

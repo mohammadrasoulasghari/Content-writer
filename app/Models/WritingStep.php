@@ -17,4 +17,9 @@ class WritingStep extends Model
     {
         return $this->belongsTo(ContentType::class);
     }
+
+    public function requestLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(RequestLog::class);
+    }
 }
