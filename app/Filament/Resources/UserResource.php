@@ -7,6 +7,7 @@ use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -38,9 +39,16 @@ class UserResource extends Resource
                         ->label('رمز عبور')
                         ->password()
                         ->dehydrateStateUsing(fn ($state) => !empty($state) ? bcrypt($state) : null),
-                    DatePicker::make('email_verified_at')
-                        ->label('تاریخ تایید ایمیل')
-                        ->disabledOn('create'),
+                    Select::make('roles')
+                        ->label('نقش‌ها')
+                        ->multiple()
+                        ->relationship('roles', 'name')
+                        ->preload(),
+                    Select::make('permissions')
+                        ->label('دسترسی‌ها')
+                        ->multiple()
+                        ->relationship('permissions', 'name')
+                        ->preload(),
                 ])
             ]);
     }
