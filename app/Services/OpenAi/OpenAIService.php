@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\OpenAi;
 
 use App\Models\AiModel;
@@ -21,7 +22,6 @@ class OpenAIService
     public function createChat(string $prompt, ?string $chatId = null)
     {
         $cacheKey = md5($prompt . ($chatId ?? ''));
-
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
@@ -36,9 +36,8 @@ class OpenAIService
             ['role' => 'system', 'content' => $this->systemPrompt],
             ['role' => 'assistant', 'content' => $this->assistantPrompt],
         ];
-
         if ($chatId) {
-            $messages[] = ['role' => 'system', 'content' => 'Continue chat: ' . $chatId];
+            $messages[] = ['role' => 'system', 'content' => "\n" . $chatId];
         }
 
         $response = OpenAI::chat()->create([

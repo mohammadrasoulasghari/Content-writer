@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filament\Resources\ArticleResource\Pages;
 
 use App\Filament\Resources\ArticleResource;
@@ -10,7 +11,6 @@ use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\NoReturn;
-use App\Jobs\ProcessOpenAIRequest;
 
 class CreateArticle extends CreateRecord
 {
@@ -20,7 +20,8 @@ class CreateArticle extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         try {
-            unset($data['english_texts']);//موقت فعلا
+            unset($data['english_texts']); // حذف فیلد english_texts موقت
+
             $writingSteps = WritingStep::where('content_type_id', $data['content_type_id'])
                 ->orderBy('order')
                 ->get();
@@ -31,14 +32,10 @@ class CreateArticle extends CreateRecord
             DB::transaction(function () use ($writingSteps, $data, &$content, &$chatId) {
                 foreach ($writingSteps as $step) {
                     $prompt = $this->generatePrompt($step->prompt, $data['title']);
-                    ProcessOpenAIRequest::dispatch($data['ai_model_id'], $prompt, $chatId)
-                        ->onQueue('openai');
-
                     $response = $this->sendToOpenAI($data['ai_model_id'], $prompt, $chatId);
-
-                    RequestLog::create([
+                    $request_log = RequestLog::create([
                         'loggable_type' => Article::class,
-                        'loggable_id' => 0,
+                        'loggable_id' => 0, // موقت، بعد از ایجاد مقاله به روز رسانی می‌شود
                         'writing_step_id' => $step->id,
                         'request' => $prompt,
                         'response' => $response['choices'][0]['message']['content'] ?? null,
@@ -50,6 +47,7 @@ class CreateArticle extends CreateRecord
                     $chatId = $response['id'] ?? $chatId;
                 }
             });
+
             $data['content'] = $content;
         } catch (\Exception $e) {
             $this->handleException($e);
@@ -66,7 +64,7 @@ class CreateArticle extends CreateRecord
 
     private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId)
     {
-        $openAIService = new OpenAIService($aiModelId, 'سیستم', 'دستیار');
+        $openAIService = new OpenAIService($aiModelId, 'لطفا خروجی را با تگ html بده', 'دستیار');
         return $openAIService->createChat($prompt, $chatId);
     }
 
