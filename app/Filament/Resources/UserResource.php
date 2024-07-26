@@ -40,15 +40,10 @@ class UserResource extends Resource
                         ->password()
                         ->dehydrateStateUsing(fn ($state) => !empty($state) ? bcrypt($state) : null),
                     Select::make('roles')
-                        ->label('نقش‌ها')
-                        ->multiple()
-                        ->relationship('roles', 'name')
-                        ->preload(),
-                    Select::make('permissions')
-                        ->label('دسترسی‌ها')
+                        ->label("سطح دسترسی")
                         ->multiple()
                         ->relationship('permissions', 'name')
-                        ->preload(),
+
                 ])
             ]);
     }
