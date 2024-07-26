@@ -43,7 +43,8 @@ class OpenAIService
         $response = OpenAI::chat()->create([
             'model' => $model->identifier,
             'messages' => $messages,
-        ]);
+            'max_tokens' => 1000,
+            ]);
 
         Cache::put($cacheKey, $response, now()->addMinutes(10));
 
