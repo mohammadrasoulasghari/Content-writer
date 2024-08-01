@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'IRANSans';
+    src: url('../fonts/IRANSans/woff2/IRANSans-Regular.woff2') format('woff2'),
+    url('../fonts/IRANSans/woff/IRANSans-Regular.woff') format('woff');
+}
+.ck-editor__editable {
+    background-color: white;
+    color: black;
+    font-family: 'Vazirmatn', sans-serif;
+}
+
+/* Dark mode */
+html[data-theme='dark'] .ck-editor__editable {
+    background-color: #1e1e1e;
+    color: white;
+    font-family: 'Vazirmatn', sans-serif;
+}

@@ -11,6 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\View;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
 
 class EditArticle extends EditRecord
 {
@@ -29,27 +30,13 @@ class EditArticle extends EditRecord
                     ->columnSpan(1)
                     ->label('کلید واژه های  مقاله')
                     ->placeholder('بعد از وارد کردن هر کلید واژه یه enter بزنید'),
-                Card::make()->schema([
-                    RichEditor::make('content')
+                    TinyEditor::make('content')
                         ->required()
                         ->columnSpan('full')
-                        ->toolbarButtons([
-                            'attachFiles',
-                            'blockquote',
-                            'bold',
-                            'bulletList',
-                            'codeBlock',
-                            'h2',
-                            'h3',
-                            'italic',
-                            'link',
-                            'orderedList',
-                            'redo',
-                            'strike',
-                            'underline',
-                            'undo',
-                        ])->extraAttributes(['id' => 'rich-editor-content']),
-                ])
+                        ->language('fa')
+                        ->showMenuBar()->template('content ')
+
+                        ,
             ]);
     }
 
