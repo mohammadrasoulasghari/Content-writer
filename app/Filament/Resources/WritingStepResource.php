@@ -29,33 +29,37 @@ class WritingStepResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-radio';
     protected static ?string $label = 'مرحله نوشتن';
     protected static ?string $pluralLabel = 'مراحل نوشتن';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Card::make()
                     ->schema([
-                        Grid::make(3)
+                        Grid::make(4)
                             ->schema([
-                                TextInput::make('name')
-                                    ->label('نام مرحله')
-                                    ->required()
-                                    ->columnSpan(2),
-                                TextInput::make('order')
-                                    ->label('ترتیب')
-                                    ->numeric()
-                                    ->default(0)
-                                    ->columnSpan(1),
-                                Select::make('content_type_id')
-                                    ->label('نوع محتوا')
-                                    ->relationship('contentType', 'name')
-                                    ->required()
-                                    ->columnSpan(2),
-                                Toggle::make('status')
-                                    ->label('وضعیت')
-                                    ->inline(false)
-                                    ->default(true)
-                                    ->columnSpan(1),
+                                Grid::make(5)
+                                ->schema([
+                                    TextInput::make('name')
+                                        ->label('نام مرحله')
+                                        ->required()
+                                        ->columnSpan(2),
+                                    TextInput::make('order')
+                                        ->label('ترتیب')
+                                        ->numeric()
+                                        ->default(0)
+                                        ->columnSpan(1),
+                                    TextInput::make('max_tokens')
+                                        ->label("حداکثر توکن مصرفی")
+                                        ->numeric()
+                                        ->default(1500)
+                                        ->columnSpan(1),
+                                    Select::make('content_type_id')
+                                        ->label('نوع محتوا')
+                                        ->relationship('contentType', 'name')
+                                        ->required()
+                                        ->columnSpan(1),
+                                ]),
                             ]),
                         Textarea::make('prompt')
                             ->label('پرامپت')
@@ -63,7 +67,6 @@ class WritingStepResource extends Resource
                             ->columnSpanFull(),
                         Repeater::make('placeholders')
                             ->label('متغیر جایگزینی')
-                            ->helperText('مثال: {subject} که به موضوع مقاله جایگزین می‌شود. متغیر پیش‌فرض: {title}')
                             ->schema([
                                 Grid::make(1)
                                     ->schema([
@@ -77,6 +80,11 @@ class WritingStepResource extends Resource
                             ])
                             ->columnSpanFull()
                             ->minItems(1),
+                        Toggle::make('status')
+                            ->label('وضعیت')
+                            ->inline(false)
+                            ->default(true)
+                            ->columnSpan(1),
                     ])
                     ->columns(1),
             ]);
@@ -115,7 +123,7 @@ class WritingStepResource extends Resource
                     ->placeholder('همه انواع محتوا'),
                 Filter::make('status')
                     ->label('فعال/غیرفعال')
-                    ->query(fn (Builder $query): Builder => $query->where('status', true)),
+                    ->query(fn(Builder $query): Builder => $query->where('status', true)),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

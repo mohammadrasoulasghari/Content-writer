@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AiModelResource\Pages;
 use App\Filament\Resources\AiModelResource\RelationManagers;
 use App\Models\AiModel;
+use App\Services\OpenAi\OpenAIModelService;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -26,16 +27,24 @@ class AiModelResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $openAIModelService = new OpenAIModelService();
+        $models = $openAIModelService->listModels();
+
+        $options = collect($models['data'])->pluck('id', 'id')->toArray();
         return $form
             ->schema([
                 Forms\Components\Card::make()->schema([
                     TextInput::make('name')
-                        ->required()
                         ->label('نام مدل')
+                        ->default(fn($get) => $get('identifier') )
                         ->columnSpan(6),
-                    TextInput::make('identifier')
+                    Select::make('identifier')
+                        ->label('فهرست مدل‌های AI"')
+                        ->reactive()
+                        ->afterStateUpdated(fn($state, $set) => $set('name', $state))
+                        ->options($options)
+                        ->searchable()
                         ->required()
-                        ->label('شناسه مدل')
                         ->columnSpan(6),
                     Textarea::make('description')
                         ->label('توضیحات مدل')

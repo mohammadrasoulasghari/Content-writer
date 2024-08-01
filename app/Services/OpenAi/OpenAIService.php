@@ -19,9 +19,9 @@ class OpenAIService
         $this->assistantPrompt = $assistantPrompt;
     }
 
-    public function createChat(string $prompt, ?string $chatId = null)
+    public function createChat(string $prompt, ?string $chatId = null, int $maxTokens = 1000)
     {
-        $cacheKey = md5($prompt . ($chatId ?? ''));
+        $cacheKey = md5($prompt . $maxTokens . ($chatId ?? ''));
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
@@ -43,8 +43,8 @@ class OpenAIService
         $response = OpenAI::chat()->create([
             'model' => $model->identifier,
             'messages' => $messages,
-            'max_tokens' => 1000,
-            ]);
+            'max_tokens' => $maxTokens
+        ]);
 
         Cache::put($cacheKey, $response, now()->addMinutes(10));
 

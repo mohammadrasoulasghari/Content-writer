@@ -20,7 +20,7 @@ class CreateArticle extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         try {
-            unset($data['english_texts']); // حذف فیلد english_texts موقت
+            unset($data['english_texts']);
 
             $writingSteps = WritingStep::where('content_type_id', $data['content_type_id'])
                 ->orderBy('order')
@@ -32,7 +32,7 @@ class CreateArticle extends CreateRecord
             DB::transaction(function () use ($writingSteps, $data, &$content, &$chatId) {
                 foreach ($writingSteps as $step) {
                     $prompt = $this->generatePrompt($step->prompt, $data['title']);
-                    $response = $this->sendToOpenAI($data['ai_model_id'], $prompt, $chatId);
+                    $response = $this->sendToOpenAI($data['ai_model_id'], $prompt, $chatId, $step->max_tokens);
                     $request_log = RequestLog::create([
                         'loggable_type' => Article::class,
                         'loggable_id' => 0, // موقت، بعد از ایجاد مقاله به روز رسانی می‌شود
@@ -62,10 +62,10 @@ class CreateArticle extends CreateRecord
         return str_replace('{title}', $title, $template);
     }
 
-    private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId)
+    private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId, $max_tokens)
     {
         $openAIService = new OpenAIService($aiModelId, 'لطفا خروجی را با تگ html بده', 'دستیار');
-        return $openAIService->createChat($prompt, $chatId);
+        return $openAIService->createChat($prompt, $chatId, $max_tokens);
     }
 
     private function handleException(\Exception $e): void
