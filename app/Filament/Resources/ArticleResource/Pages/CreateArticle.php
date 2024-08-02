@@ -49,7 +49,7 @@ class CreateArticle extends CreateRecord
                 }
             });
 
-            $data['content'] = $content;
+            $data['content'] = $this->cleanHtmlTagsFromContent($content);
         } catch (\Exception $e) {
             $this->handleException($e);
             return $data;
@@ -91,4 +91,10 @@ class CreateArticle extends CreateRecord
             ->update(['loggable_id' => $this->record->getKey()]);
         $this->redirect(ArticleResource::getUrl('edit', ['record' => $this->record->getKey()]));
     }
+
+    protected function cleanHtmlTagsFromContent($content): array|string|null
+    {
+        return preg_replace('/```html|```/', '', $content);
+    }
+
 }
