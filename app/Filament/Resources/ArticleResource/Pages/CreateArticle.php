@@ -68,7 +68,7 @@ class CreateArticle extends CreateRecord
      */
     private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId, int $maxTokens, float $temperature)
     {
-        $openAIService = new OpenAIService($aiModelId, 'لطفا خروجی را با تگ html بده', 'دستیار');
+        $openAIService = new OpenAIService($aiModelId);
         return $openAIService->createChat($prompt, $chatId, $maxTokens, $temperature);
     }
 
