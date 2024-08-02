@@ -4,11 +4,12 @@ namespace App\Filament\Resources\ArticleResource\Pages;
 
 use App\Filament\Resources\ArticleResource;
 use App\Models\Article;
-use App\Models\WritingStep;
+use App\Models\ContentType;
 use App\Models\RequestLog;
+use App\Models\WritingStep;
 use App\Services\OpenAi\OpenAIService;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\NoReturn;
@@ -30,11 +31,21 @@ class CreateArticle extends CreateRecord
             $content = '';
             $chatId = null;
 
-            DB::transaction(function () use ($writingSteps, $data, &$content, &$chatId) {
+            $contentType = ContentType::find($data['content_type_id']);
+
+            DB::transaction(function () use ($contentType, $writingSteps, $data, &$content, &$chatId) {
                 foreach ($writingSteps as $step) {
                     $prompt = $this->generatePrompt($step->prompt, $data['title']);
-                    $response = $this->sendToOpenAI($data['ai_model_id'], $prompt, $chatId, $step->max_tokens, $step->temperature);
-                    $request_log = RequestLog::create([
+                    $response = $this->sendToOpenAI(
+                        $data['ai_model_id'],
+                        $prompt,
+                        $chatId,
+                        $step->max_tokens,
+                        $step->temperature,
+                        $contentType->system_prompt,
+                        $contentType->assistant_prompt
+                    );
+                    RequestLog::create([
                         'loggable_type' => Article::class,
                         'loggable_id' => 0, // موقت، بعد از ایجاد مقاله به روز رسانی می‌شود
                         'writing_step_id' => $step->id,
@@ -66,9 +77,9 @@ class CreateArticle extends CreateRecord
     /**
      * @throws \Exception
      */
-    private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId, int $maxTokens, float $temperature)
+    private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId, int $maxTokens, float $temperature, string $systemPrompt, string $assistantPrompt)
     {
-        $openAIService = new OpenAIService($aiModelId);
+        $openAIService = new OpenAIService($aiModelId, $systemPrompt, $assistantPrompt);
         return $openAIService->createChat($prompt, $chatId, $maxTokens, $temperature);
     }
 

@@ -36,6 +36,17 @@ class ContentTypeResource extends Resource
                         Textarea::make('description')
                             ->label('توضیحات')
                             ->columnSpanFull(),
+                        Textarea::make('system_prompt')
+                            ->label('پرامپت سیستم')
+                            ->helperText('این پرامپت به عنوان راهنمایی برای سیستم استفاده می‌شود.')
+                            ->nullable()
+                            ->columnSpanFull(),
+
+                        Textarea::make('assistant_prompt')
+                            ->label('پرامپت دستیار')
+                            ->helperText('این پرامپت به عنوان راهنمایی برای دستیار استفاده می‌شود.')
+                            ->nullable()
+                            ->columnSpanFull(),
                     ])
                     ->columns(1),
             ]);
