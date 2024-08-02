@@ -38,58 +38,74 @@ class WritingStepResource extends Resource
                     ->schema([
                         Grid::make(4)
                             ->schema([
-                                Grid::make(5)
-                                ->schema([
-                                    TextInput::make('name')
-                                        ->label('نام مرحله')
-                                        ->required()
-                                        ->columnSpan(2),
-                                    TextInput::make('order')
-                                        ->label('ترتیب')
-                                        ->numeric()
-                                        ->default(0)
-                                        ->columnSpan(1),
-                                    TextInput::make('max_tokens')
-                                        ->label("حداکثر توکن مصرفی")
-                                        ->numeric()
-                                        ->default(1500)
-                                        ->columnSpan(1),
-                                    Select::make('content_type_id')
-                                        ->label('نوع محتوا')
-                                        ->relationship('contentType', 'name')
-                                        ->required()
-                                        ->columnSpan(1),
-                                ]),
-                            ]),
-                        Textarea::make('prompt')
-                            ->label('پرامپت')
-                            ->required()
-                            ->columnSpanFull(),
-                        Repeater::make('placeholders')
-                            ->label('متغیر جایگزینی')
-                            ->schema([
-                                Grid::make(1)
+                                Grid::make(6)
                                     ->schema([
-                                        TextInput::make('key')
-                                            ->label('کلید')
+                                        TextInput::make('name')
+                                            ->label('نام مرحله')
                                             ->required()
-                                            ->default('title')
-                                            ->hint('کلید جایگزینی باید منحصربه‌فرد باشد و نباید تکراری باشد.')
+                                            ->helperText('نام مرحله نوشتن را مشخص کنید.')
+                                            ->columnSpan(2),
+                                        TextInput::make('order')
+                                            ->label('ترتیب')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->helperText('ترتیب اجرای مرحله را مشخص کنید.')
+                                            ->columnSpan(1),
+                                        TextInput::make('max_tokens')
+                                            ->label('حداکثر توکن مصرفی')
+                                            ->numeric()
+                                            ->default(1500)
+                                            ->helperText('حداکثر تعداد توکن برای تولید محتوا.')
+                                            ->columnSpan(1),
+                                        TextInput::make('temperature')
+                                            ->label('میزان دقت/خلاقیت')
+                                            ->numeric()
+                                            ->step(0.1)
+                                            ->default(0.7)
+                                            ->maxValue(1)
+                                            ->minValue(0.1)
+                                            ->helperText('مقدار بین 0 و 1 برای تعیین میزان خلاقیت.')
+                                            ->columnSpan(1),
+                                        Select::make('content_type_id')
+                                            ->label('نوع محتوا')
+                                            ->relationship('contentType', 'name')
+                                            ->required()
+                                            ->helperText('نوع محتوای مرتبط با این مرحله.')
                                             ->columnSpan(1),
                                     ]),
+                                Textarea::make('prompt')
+                                    ->label('پرامپت')
+                                    ->required()
+                                    ->helperText('پرامپت اصلی برای مدل هوش مصنوعی.')
+                                    ->columnSpan(3)->rows(7),
+                                Repeater::make('placeholders')
+                                    ->label('متغیر جایگزینی')
+                                    ->schema([
+                                        Grid::make(1)
+                                            ->schema([
+                                                TextInput::make('key')
+                                                    ->label('کلید')
+                                                    ->required()
+                                                    ->default('title')
+                                                    ->hint('کلید جایگزینی باید منحصربه‌فرد باشد و نباید تکراری باشد.')
+                                                    ->helperText('کلید جایگزینی برای متن‌های متغیر.')
+                                                    ->columnSpan(2),
+                                            ]),
+                                    ])
+                                    ->minItems(1)
+                                    ->columnSpan(3),  // تنظیم اندازه برای کوچکتر شدن
                             ])
-                            ->columnSpanFull()
-                            ->minItems(1),
+                            ->columns(6),
                         Toggle::make('status')
                             ->label('وضعیت')
-                            ->inline(false)
+                            ->inline(true)
                             ->default(true)
+                            ->helperText('فعال یا غیرفعال بودن مرحله.')
                             ->columnSpan(1),
                     ])
                     ->columns(1),
             ]);
     }
-
     public static function table(Table $table): Table
     {
         return $table

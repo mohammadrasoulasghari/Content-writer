@@ -10,6 +10,7 @@ use App\Services\OpenAi\OpenAIService;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\NoReturn;
 
 class CreateArticle extends CreateRecord
@@ -32,7 +33,7 @@ class CreateArticle extends CreateRecord
             DB::transaction(function () use ($writingSteps, $data, &$content, &$chatId) {
                 foreach ($writingSteps as $step) {
                     $prompt = $this->generatePrompt($step->prompt, $data['title']);
-                    $response = $this->sendToOpenAI($data['ai_model_id'], $prompt, $chatId, $step->max_tokens);
+                    $response = $this->sendToOpenAI($data['ai_model_id'], $prompt, $chatId, $step->max_tokens, $step->temperature);
                     $request_log = RequestLog::create([
                         'loggable_type' => Article::class,
                         'loggable_id' => 0, // موقت، بعد از ایجاد مقاله به روز رسانی می‌شود
@@ -62,15 +63,18 @@ class CreateArticle extends CreateRecord
         return str_replace('{title}', $title, $template);
     }
 
-    private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId, $max_tokens)
+    /**
+     * @throws \Exception
+     */
+    private function sendToOpenAI(int $aiModelId, string $prompt, ?string $chatId, int $maxTokens, float $temperature)
     {
         $openAIService = new OpenAIService($aiModelId, 'لطفا خروجی را با تگ html بده', 'دستیار');
-        return $openAIService->createChat($prompt, $chatId, $max_tokens);
+        return $openAIService->createChat($prompt, $chatId, $maxTokens, $temperature);
     }
 
     private function handleException(\Exception $e): void
     {
-        \Log::error('Error while creating article: ' . $e->getMessage(), [
+        Log::error('Error while creating article: ' . $e->getMessage(), [
             'exception' => $e,
         ]);
 
