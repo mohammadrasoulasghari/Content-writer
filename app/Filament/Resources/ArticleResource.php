@@ -7,6 +7,7 @@ use App\Filament\Resources\ArticleResource\RelationManagers;
 use App\Models\AiModel;
 use App\Models\Article;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -15,8 +16,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-
+use Illuminate\Database\Eloquent\Builder;
 class ArticleResource extends Resource
 {
     protected static ?string $model = Article::class;
@@ -67,23 +71,61 @@ class ArticleResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')->label('عنوان مقاله'),
-                Tables\Columns\TextColumn::make('keywords')->label('کلمات کلیدی'),
-                Tables\Columns\TextColumn::make('description')->label('توضیحات'),
+                TextColumn::make('title')
+                    ->label('عنوان مقاله')
+                    ->sortable()
+                    ->searchable()
+                    ->wrap(),
+
+                // اضافه کردن ستون جدید برای نمایش نام مدل هوش مصنوعی
+                TextColumn::make('aiModel.name')
+                    ->label('مدل هوش مصنوعی')
+                    ->sortable()
+                    ->searchable()
+                    ->wrap(),
+
+                // اضافه کردن ستون جدید برای نمایش نوع محتوا
+                TextColumn::make('contentType.name')
+                    ->label('نوع محتوا')
+                    ->sortable()
+                    ->searchable()
+                    ->wrap(),
+
+                TextColumn::make('created_at')
+                    ->label('تاریخ ایجاد')
+                    ->sortable()
+                    ->dateTime('d-m-Y'),
             ])
             ->filters([
-                //
+                SelectFilter::make('ai_model_id')
+                    ->label('مدل هوش مصنوعی')
+                    ->relationship('aiModel', 'name')
+                    ->placeholder('همه مدل‌ها'),
+
+                SelectFilter::make('content_type_id')
+                    ->label('نوع محتوا')
+                    ->relationship('contentType', 'name')
+                    ->placeholder('همه انواع محتوا'),
+
+                Filter::make('created_at')
+                    ->label('تاریخ ایجاد')
+                    ->form([
+                        DatePicker::make('created_from')->label('از تاریخ'),
+                        DatePicker::make('created_to')->label('تا تاریخ'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query
+                            ->when($data['created_from'], fn(Builder $query, $date) => $query->whereDate('created_at', '>=', $date))
+                            ->when($data['created_to'], fn(Builder $query, $date) => $query->whereDate('created_at', '<=', $date));
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
