@@ -1,6 +1,10 @@
 <?php
 
+use App\Jobs\GenerateArticleJob;
+use App\Models\ArticleTopic;
+use App\Services\ArticleGeneratorService;
 use App\Services\Scraping\GoogleChrome\GoogleChromeScrapingService;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +22,5 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 Route::get('/s', function () {
-    $r = GoogleChromeScrapingService::scrape('داکر چیست؟');
-    dd($r);
+    GenerateArticleJob::dispatch();
 });
