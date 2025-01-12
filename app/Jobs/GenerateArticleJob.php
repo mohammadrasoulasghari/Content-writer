@@ -25,9 +25,6 @@ class GenerateArticleJob
     public function handle(): void
     {
         $articleTopic = ArticleTopic::where('status', 'pending')->inRandomOrder()->first();
-        if ($articleTopic) {
-            $articleGenerator = new ArticleGeneratorService();
-            $articleGenerator->generateArticle($articleTopic);
-        }
+        if ($articleTopic) ArticleGeneratorService::generateArticle($articleTopic);
     }
 }

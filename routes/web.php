@@ -22,5 +22,5 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 Route::get('/s', function () {
-    GenerateArticleJob::dispatch();
+    dd(ArticleGeneratorService::generateArticle(ArticleTopic::query()->firstOrFail()));
 });
